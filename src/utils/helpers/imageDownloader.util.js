@@ -17,6 +17,7 @@ export const download = async (url, assetPath) => {
         data.pipe(writer)
         // console.log("the data", data)        
         // console.log(writer.path)
+        //FIXME function needs to return only after writing to file is complete
         return writer.path;
     }catch(error){
         console.error(error)
