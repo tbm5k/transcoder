@@ -1,6 +1,6 @@
 import amqp from "amqplib";
 
-export const consumer = async () => {
+(async () => {
     const queueName: string = "jobs";
 
     try {
@@ -22,4 +22,4 @@ export const consumer = async () => {
     } catch (error) {
         console.log(error);
     }
-};
+})();

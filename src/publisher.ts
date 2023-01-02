@@ -1,6 +1,6 @@
 import amqp from "amqplib";
 
-export const rabbitMq = async () => {
+(async () => {
 
     const queueName: string = "jobs";
     const data: string = process.argv[2];
@@ -18,4 +18,4 @@ export const rabbitMq = async () => {
         console.error(error);
     }
 
-}
+})();
