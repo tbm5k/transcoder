@@ -1,4 +1,7 @@
 import amqp, { ConsumeMessage } from "amqplib";
+import ffmpeg from "fluent-ffmpeg";
+
+// const fluent = ffmpeg();
 
 (async () => {
     const queueName: string = "jobs";
@@ -30,6 +33,7 @@ import amqp, { ConsumeMessage } from "amqplib";
         await channel.consume(assertedQueue.queue, (message: ConsumeMessage | null) => {
             if(message?.content) {
                 console.log(message.content.toString())
+                ffmpeg(message.content.toString()).output("~/videos/reduced.mp4").size('1080x720');
                 channel.ack(message);
             };
         })
