@@ -1,10 +1,9 @@
+import * as dotenv from "dotenv";
 import amqp, { ConsumeMessage } from "amqplib";
 import ffmpeg from "fluent-ffmpeg";
-
-// const fluent = ffmpeg();
+dotenv.config();
 
 (async () => {
-    const queueName: string = "jobs";
     const exchangeName: string = "1080p";
 
     try {
@@ -33,7 +32,15 @@ import ffmpeg from "fluent-ffmpeg";
         await channel.consume(assertedQueue.queue, (message: ConsumeMessage | null) => {
             if(message?.content) {
                 console.log(message.content.toString())
-                ffmpeg(message.content.toString()).output("~/videos/reduced.mp4").size('1080x720');
+                // const stream = fs.createWriteStream(`/mnt/c/Users/teddy/Desktop${message.content.toString()}`);
+                const fileName = message.content.toString();
+                ffmpeg(fileName)
+                    .output(`${process.env.COMPRESSED_DIR}${fileName.split("videos")[1]}`)
+                    .size('1080x720')
+                    .on("start", command => {
+                        console.log(command)
+                    })
+                    .run();
                 channel.ack(message);
             };
         })
