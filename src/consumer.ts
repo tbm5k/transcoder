@@ -1,6 +1,7 @@
 import * as dotenv from "dotenv";
 import amqp, { ConsumeMessage } from "amqplib";
 import ffmpeg from "fluent-ffmpeg";
+var getDimensions = require('get-video-dimensions')
 dotenv.config();
 
 (async () => {
@@ -29,11 +30,15 @@ dotenv.config();
 
         await channel.bindQueue(assertedQueue.queue, exchangeName, '');
 
-        await channel.consume(assertedQueue.queue, (message: ConsumeMessage | null) => {
+        await channel.consume(assertedQueue.queue, async (message: ConsumeMessage | null) => {
             if(message?.content) {
                 console.log(message.content.toString())
                 // const stream = fs.createWriteStream(`/mnt/c/Users/teddy/Desktop${message.content.toString()}`);
                 const fileName = message.content.toString();
+                
+                const dimensions = await getDimensions(fileName);
+                console.log("dimensions: ", dimensions)
+
                 ffmpeg(fileName)
                     .output(`${process.env.COMPRESSED_DIR}${fileName.split("videos")[1]}`)
                     .size('1080x720')
