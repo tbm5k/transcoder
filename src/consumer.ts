@@ -39,13 +39,17 @@ dotenv.config();
                 const dimensions = await getDimensions(fileName);
                 console.log("dimensions: ", dimensions)
 
-                ffmpeg(fileName)
-                    .output(`${process.env.COMPRESSED_DIR}${fileName.split("videos")[1]}`)
-                    .size('1080x720')
-                    .on("start", command => {
-                        console.log(command)
-                    })
-                    .run();
+                switch(dimensions.height){
+                    case 2160:
+                        transcode(fileName, 2560, 1440);
+                        transcode(fileName, 1920, 1080);
+                        transcode(fileName, 1280, 720);
+                        transcode(fileName, 640, 480);
+                        transcode(fileName, 640, 360);
+                    default:
+                        console.log("Resolution not in range")
+
+                }
                 channel.ack(message);
             };
         })
@@ -54,3 +58,17 @@ dotenv.config();
         console.log(error);
     }
 })();
+
+const transcode = (fileName: string, width: number, height: number) => {
+    /*
+    1920x1080
+    h = 1080
+    */
+    ffmpeg(fileName)
+    .output(`${process.env.COMPRESSED_DIR}${fileName.split("videos")[1]}`)
+    .size(`${width}x${height}`)
+    .on("start", command => {
+        console.log(command)
+    })
+    .run();
+}
