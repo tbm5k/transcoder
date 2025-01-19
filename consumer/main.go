@@ -1,10 +1,18 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 
 	amqp "github.com/rabbitmq/amqp091-go"
 )
+
+type FileMeta struct {
+    Name string `json:"name"`
+    Size int `json:"size"`
+    ContentType string `json:"content-type"`
+    Content string `json:"content"`
+}
 
 func main() {
     
@@ -34,7 +42,15 @@ func main() {
 
     go func() {
         for d := range msgs {
-            fmt.Printf("%s \n", d.Body)
+
+            var metadata FileMeta
+
+            err := json.Unmarshal(d.Body, &metadata)
+            if err != nil {
+                fmt.Println(err)
+            }
+
+            fmt.Printf("%v \n", metadata.Size)
         }
     }()
 
